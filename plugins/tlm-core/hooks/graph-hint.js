@@ -61,8 +61,8 @@ function ctxTokens(transcript) {
   } catch {}
   return 0
 }
-function advisorWarning(ev) {
-  const t = ctxTokens(ev.transcript_path || '')
+function advisorWarning(ev, extra = 0) {
+  const t = ctxTokens(ev.transcript_path || '') + extra
   if (t < CTX_LIMIT) return ''
   return `Context is ~${Math.round(t / 1000)}k tokens. Do NOT consult the advisor now: it rereads the whole conversation uncached. If you need it, first update "## Current state" in CLAUDE.local.md (including the exact question for the advisor), then stop and ask me to run /clear and say continue.`
 }
@@ -100,6 +100,20 @@ process.stdin.on('end', () => {
       const root = graphRoot(path.isAbsolute(target) ? target : path.join(cwd, target))
       if (root && firstTime(ev.session_id, root)) {
         return emit(event, `Note: ${root} has a graphify graph (graphify-out/). Before more searching there, ${QUERY}.`)
+      }
+      process.exit(0)
+    }
+    if (event === 'PostToolUse' && !(ev.tool_name === 'Skill' && /graphify/i.test(String(input.skill || input.command || '')))) {
+      // Context grows within a turn: estimate it right after each tool result and warn at 150k, 250k, 350k...
+      if (ev.agent_id) process.exit(0)
+      let resp = ''
+      try { resp = JSON.stringify(ev.tool_response ?? '') } catch {}
+      const extra = Math.ceil(resp.length / 4)
+      const warn = advisorWarning(ev, extra)
+      if (warn) {
+        const t = ctxTokens(ev.transcript_path || '') + extra
+        const step = Math.floor((t - CTX_LIMIT) / 100000)
+        if (firstTime(ev.session_id, '__advisor_ctx_post_' + step)) return emit(event, warn)
       }
       process.exit(0)
     }

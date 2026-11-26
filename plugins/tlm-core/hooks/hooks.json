@@ -35,7 +35,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Skill",
+        "matcher": "Skill|Read|Bash|PowerShell|Grep|Glob|WebFetch|Agent|Task|mcp__.*",
         "hooks": [
           {
             "type": "command",
