@@ -12,10 +12,16 @@ process.stdin.on('end', () => {
     process.exit(2);
   };
 
-  if (/^mcp__tia-portal.*__InvokeOpennessApi$/.test(tool)) {
+  // tia-scout is offline-only (needs agent_type in the hook input; tools/disallowedTools in its definition is the fallback).
+  if (ev.agent_type === 'tia-scout' && /^mcp__tia-portal/.test(tool) && !/__(TiaFindTools|BrowseOpennessApi|ValidatePlan)$/.test(tool)) {
+    block('tia-scout is offline-only');
+  }
+
+  // RunPlan/ValidatePlan carry InvokeOpennessApi-style args inside their steps: JSON.stringify(input) covers every step.
+  if (/^mcp__tia-portal.*__(InvokeOpennessApi|RunPlan|ValidatePlan)$/.test(tool)) {
     const s = JSON.stringify(input);
     if (/download|upload|ip.?address|ipv4|subnet|router|password|secret|firmware|go.?online|online|protect|knowhow|know.?how|factory.?reset|ram.?to.?rom|activation.?state|safety|alarm|runtime|commit.?session|delete.?(local)?session/i.test(s)) {
-      block('InvokeOpennessApi call touches download/network/password/protection/safety/online/runtime');
+      block('InvokeOpennessApi/RunPlan call touches download/network/password/protection/safety/online/runtime');
     }
     process.exit(0);
   }

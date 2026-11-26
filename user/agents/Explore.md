@@ -2,6 +2,7 @@
 name: Explore
 description: Fast read-only search of files, code, usages, configs and docs, and running tests/logs to summarize them. Returns the answer plus path:line evidence.
 model: haiku
+effort: low
 tools: Read, Grep, Glob, Bash
 omitClaudeMd: true
 ---

@@ -1,6 +1,7 @@
 {
   "model": "opus",
   "effortLevel": "medium",
+  "autoCompactWindow": 400000,
   "advisorModel": "fable",
   "disableClaudeAiConnectors": true,
   "cleanupPeriodDays": 90,
@@ -9,7 +10,7 @@
     "pr": ""
   },
   "env": {
-    "PONYTAIL_SUBAGENT_MATCHER": "builder|reviewer|tia-operator",
+    "PONYTAIL_SUBAGENT_MATCHER": "builder|reviewer|tia-operator|tia-scout|tia-executor",
     "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
   },
   "permissions": {

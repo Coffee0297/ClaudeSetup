@@ -2,6 +2,7 @@
 name: researcher
 description: Web research - searches and reads public pages (docs, datasheets, forums, release notes) and returns a short sourced answer. Use for every web search or page fetch.
 model: haiku
+effort: low
 tools: WebSearch, WebFetch, Read
 omitClaudeMd: true
 ---

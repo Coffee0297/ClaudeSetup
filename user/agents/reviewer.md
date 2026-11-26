@@ -2,6 +2,7 @@
 name: reviewer
 description: Independent bug hunt on a change (ponytail-review checklist). Use for diffs over ~50 lines, multi-file or risky changes, before reporting done. Never edits.
 model: opus
+effort: high
 tools: Read, Grep, Glob, Bash
 skills: ponytail:ponytail-review
 omitClaudeMd: true

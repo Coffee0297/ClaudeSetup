@@ -28,7 +28,8 @@
   - [review] Over-engineering, leanness or load of a change: /ponytail-review on the commit range.
   - [review] Risky or safety-related (PLC, firmware) before merge: /code-review high, then /ponytail-review.
   - [review] Committed work: review the commit range, never an empty git diff. Say what range you reviewed.
-- Same problem failed twice, or a hard design decision -> consult the advisor.
+- Same problem failed twice, or a hard design decision -> consult the advisor (on demand only; at large context, see [advisor-ctx]).
+- Parallel: at most 4 writing/long agents at once; read-only Explore/researcher up to 6. Never use /fast (bills usage credits).
 - [advisor-ctx] Before consulting the advisor when this conversation is long (roughly over 150k tokens of context, or after many large file reads): the advisor rereads the whole conversation uncached, so do the handoff first (update "## Current state" in CLAUDE.local.md, including the exact question for the advisor), then STOP and tell me: "Context is long - run /clear, then say continue, and I will ask the advisor from the handoff." Only skip this if I said it is urgent.
 - [graphify] Code/architecture/where-is/what-depends questions in a git repo: if graphify-out/ exists, run /graphify query "<question>" --budget 1500 first; use Grep only to confirm or when the graph has no answer.
 - [graphify] If graphify-out/ is missing and this is a real code repo (git, ~50+ source files; not home, Downloads or Temp; not a one-line task): say so in one line, then build it in the BACKGROUND with a Sonnet subagent running /graphify . --no-viz, and add graphify-out/ to .git/info/exclude. Answer my question meanwhile with Grep; never wait for the build.
@@ -46,8 +47,11 @@
 
 ## TIA Portal (any TIA MCP tool)
 - Connect only when I ask you to work on the live project.
-- The live project is one shared state: one writer at a time, you or ONE `tia-operator`. While it runs, make no TIA calls; wait for its report.
+- The live project is one shared state: one writer at a time, you or ONE `tia-executor`/`tia-operator`. While it runs, make no TIA calls; wait for its report.
 - Parallel `Explore` is fine for docs (~/Documents/Git/Init_Tia_MCP/.claude/skills/knowledge/: recipes, conventions.md, v21-gaps.md; api-v21; XmlDoc), never for project files (Rule 0).
-- A few TIA calls: do them yourself. Larger change: plan, then hand to `tia-operator` with recipe, softwarePath and done-criteria.
+- A few TIA calls: do them yourself. Ad-hoc or small live change: `tia-operator` with recipe, softwarePath and done-criteria.
+- TIA change pipeline: lead plans -> `builder` writes sources -> `tia-scout` writes the JSON call plan (offline) -> ONE `tia-executor` runs ValidatePlan + RunPlan + compile -> lead checks step results. The lead makes no TIA calls except a single read I asked for.
+- Judge TIA work by the server's per-step ok/compile counts, never by an agent's prose.
+- Project facts (softwarePaths, device/table names) live in <plc-project>\.claude\tia-cookbook.md; only the lead writes it.
 - Download, IP, passwords (except SetSafetyPassword), firmware, protection and runtime writes are blocked by settings/hook; I do those in TIA Portal.
 - `V21LimitedSurface` with no workaround, or the same compile failure twice: consult the advisor.
