@@ -1,0 +1,10 @@
+{
+  "name": "agent-board",
+  "version": "0.8.0",
+  "description": "Side pane: lead and subagent models, what each is doing, token use and cost per agent, and a session log.",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "tlm"
+  },
+  "license": "MIT"
+}

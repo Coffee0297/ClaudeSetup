@@ -1,0 +1,59 @@
+{
+  "model": "opus",
+  "effortLevel": "medium",
+  "advisorModel": "fable",
+  "disableClaudeAiConnectors": true,
+  "cleanupPeriodDays": 90,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "env": {
+    "PONYTAIL_SUBAGENT_MATCHER": "builder|reviewer|tia-operator",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  },
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "mcp__tia-portal*__DownloadToDevice",
+      "mcp__tia-portal*__SetIpAddress",
+      "mcp__tia-portal*__SetNetworkInterfaceAttribute",
+      "mcp__tia-portal*__ChangeDeviceFirmwareVersion",
+      "mcp__tia-portal*__GoOnline",
+      "mcp__tia-portal*__SetPlcPassword",
+      "mcp__tia-portal*__SetPlcAccessPassword",
+      "mcp__tia-portal*__ResetPlcAccessPassword",
+      "mcp__tia-portal*__SetPlcMasterSecret",
+      "mcp__tia-portal*__ChangePlcMasterSecret",
+      "mcp__tia-portal*__ResetPlcMasterSecret",
+      "mcp__tia-portal*__SetProjectUserPassword",
+      "mcp__tia-portal*__SetOpcUaUserPassword",
+      "mcp__tia-portal*__SetWebserverUserPassword",
+      "mcp__tia-portal*__SetSafetyOfflineProgramPassword",
+      "mcp__tia-portal*__RevokeSafetyOfflineProgramPassword",
+      "mcp__tia-portal*__SetSafetyModificationsPossible",
+      "mcp__tia-portal*__SetFChangeHistoryUsername",
+      "mcp__tia-portal*__ProtectPlcConfiguration",
+      "mcp__tia-portal*__UnprotectPlcConfiguration",
+      "mcp__tia-portal*__ProtectPlcMasterSecret",
+      "mcp__tia-portal*__UnprotectPlcMasterSecret",
+      "mcp__tia-portal*__SetPlcProtectionAccessLevel",
+      "mcp__tia-portal*__RemoveBlockKnowHowProtection",
+      "mcp__tia-portal*__RemoveBlockWriteProtection",
+      "mcp__tia-portal*__SetBlockKnowHowProtection",
+      "mcp__tia-portal*__PerformDriveFactoryReset",
+      "mcp__tia-portal*__PerformDriveRamToRomCopy",
+      "mcp__tia-portal*__ChangeDriveObjectActivationState",
+      "mcp__tia-portal*__WriteWinCCTags",
+      "mcp__tia-portal*__AcknowledgeAlarms",
+      "mcp__tia-portal*__ResetAlarms",
+      "mcp__tia-portal*__ShelveAlarms",
+      "mcp__tia-portal*__DisableAlarms",
+      "mcp__tia-portal*__UnlockProductionScreenWrites",
+      "mcp__tia-portal*__CloseAndCommitSession",
+      "mcp__tia-portal*__DeleteLocalSessionFromServer",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  }
+}

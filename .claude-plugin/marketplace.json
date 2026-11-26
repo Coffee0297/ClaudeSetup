@@ -1,0 +1,9 @@
+{
+  "name": "claude-setup",
+  "owner": { "name": "tlm" },
+  "metadata": { "description": "Personal Claude Code setup: guard + routing hooks and the Agent Board side pane." },
+  "plugins": [
+    { "name": "tlm-core", "source": "./plugins/tlm-core", "description": "Guard hook (hardware/PR/TIA/lead-build blocks) and graph-first + context-size routing hints." },
+    { "name": "agent-board", "source": "./plugins/agent-board", "description": "Side pane: models, agents, activity, tokens, cost, plan limits." }
+  ]
+}
