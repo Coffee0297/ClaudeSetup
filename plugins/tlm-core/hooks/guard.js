@@ -25,6 +25,12 @@ process.stdin.on('end', () => {
     process.exit(2);
   }
 
+  // Web searches/fetches belong in the `researcher` (Haiku) subagent, not in the lead's context.
+  if ((tool === 'WebSearch' || tool === 'WebFetch') && !ev.agent_id && process.env.CLAUDE_LEAD_WEB !== '1') {
+    process.stderr.write('Blocked in the main session: web searches and page fetches go to the `researcher` subagent (Haiku). Brief it with the exact question; it returns a short answer with source URLs. (The user can allow lead web access by starting Claude with CLAUDE_LEAD_WEB=1.)');
+    process.exit(2);
+  }
+
   // Builds and test runs belong in a builder subagent, not in the lead's context.
   // agent_id is present only for subagent calls. Opt out per shell: CLAUDE_LEAD_BUILDS=1.
   if ((tool === 'Bash' || tool === 'PowerShell') && !ev.agent_id && process.env.CLAUDE_LEAD_BUILDS !== '1') {

@@ -4,7 +4,6 @@
 - Put independent tool calls in ONE message. Grep first, then read only the needed lines. Don't re-read files you just edited.
 - Finish every step I listed or you planned; don't stop to check in. If truly blocked, say exactly what blocks it.
 - "Done" = verified the way I'll use it: drive the real UI or run the test that exercises the change, not just a build. Say what you verified and what you didn't.
-- Waiting on tests/UI/processes: poll for the condition and continue as soon as it is met; never fixed sleeps. A time budget is only a cap for issues (hangs, failures), not a wait.
 - Ask before assuming wiring, part numbers, hardware state or which file is canonical.
 - Short replies, no narration.
 
@@ -18,6 +17,7 @@
 ## Main session only (subagents: skip this section)
 - Do the work yourself by default. Delegate only when it pays:
   - Any investigation or lookup where you do not already know the answer or the file ("why does X", "where is Y", "which config", "find all Z"), and any verbose output (tests, logs, configs): send `Explore` (Haiku) FIRST, several in parallel for separate questions. Only its short answer enters your context. Edits to files you already know: do them yourself.
+  - Web searches and page fetches -> `researcher` (Haiku), several in parallel for separate questions (a hook blocks WebSearch/WebFetch in the main session).
   - 2+ independent changes in separate files -> one `builder` each, all in ONE message, each briefed with goal, files, done-criteria.
   - [build-delegate] Builds, test runs, installers, sandboxes and self-tests ALWAYS go to a `builder` (Sonnet) agent in the background (a hook blocks them in the main session). Brief it with exact commands; ask for pass/fail plus the first errors per target; keep working meanwhile. Live TIA tests count as TIA calls: none from you while it runs.
   - Diff over ~50 lines, multi-file, or risky -> `reviewer` once before reporting done.

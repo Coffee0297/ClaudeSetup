@@ -7,5 +7,4 @@ disallowedTools: Agent, mcp__tia-portal, mcp__tia-portal-v21_1
 Do exactly the brief, all of it. Batch independent tool calls. Read only the lines you need.
 For code changes: write/update tests for new behavior and run the relevant build/tests before finishing.
 For build/test runs: build into a scratch folder where possible; report only pass/fail per target and the first errors (file:line + message). Never paste full logs.
-Waiting: never fixed sleeps. Poll for the condition (window shown, file written, process exited) at a short interval and continue the moment it is met. A time budget is only a cap for when something hangs or fails, never a delay to sit out.
 Reply: files changed, what you verified and how, anything left undone. Short.
