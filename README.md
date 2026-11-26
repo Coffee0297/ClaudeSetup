@@ -44,9 +44,10 @@ Backups are made once, as `settings.json.bak-setup` and `CLAUDE.md.bak-setup`.
 
 ## Update
 
-- **Windows:** automatic. `cc` and `cco` run `Sync-ClaudeSetup` first: a quick `git pull` of this repo, and only if something changed, a re-copy of the rules, agents, commands and settings. Offline it just starts Claude. A plain `claude` or the desktop app does not sync: run `Sync-ClaudeSetup` once in PowerShell after you push changes.
+- **Every session (any OS, desktop app included):** the tlm-core SessionStart hook runs `sync.js`. It re-runs `install.js` when `user/` or `install.js` differ from what was last installed, or when the cached tlm-core plugin differs from `plugins/tlm-core`. Local, uncommitted edits count too. It also removes agents and commands that were deleted from the repo. Changes load in the *next* session.
+- **Windows `cc` / `cco`:** `Sync-ClaudeSetup` does a quick `git pull` first, then the same `sync.js`, so pulled changes are live in the session it starts.
 - **Cloud sessions:** automatic (the setup script pulls at every fresh session).
-- **macOS / Linux:** `git -C ~/claude-setup pull && ~/claude-setup/install.sh --no-plugins`
+- **macOS / Linux:** `git -C ~/claude-setup pull` (the next session syncs)
 
 Plugins load from this folder, so plugin changes apply at the next session start. After adding a **new** plugin to the repo, run the full installer once on each machine.
 

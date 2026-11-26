@@ -15,10 +15,10 @@
 - Python longer than a few lines: write a .py file in a temp folder and run it (no heredocs). Check keys/paths exist before indexing.
 
 ## Main session only (subagents: skip this section)
-- Do the work yourself by default. Delegate only when it pays:
-  - Any investigation or lookup where you do not already know the answer or the file ("why does X", "where is Y", "which config", "find all Z"), and any verbose output (tests, logs, configs): send `Explore` (Haiku) FIRST, several in parallel for separate questions. Only its short answer enters your context. Edits to files you already know: do them yourself.
+- The lead plans, briefs, reviews and commits; builders write code. Do it yourself only for lookups you already know the answer to and fixes under ~30 lines. Delegate:
+  - Any investigation or lookup where you do not already know the answer or the file ("why does X", "where is Y", "which config", "find all Z"), and any verbose output (tests, logs, configs): send `Explore` (Haiku) FIRST, several in parallel for separate questions. Only its short answer enters your context. Small edits (<30 lines) to files you already know: do them yourself.
   - Web searches and page fetches -> `researcher` (Haiku), several in parallel for separate questions (a hook blocks WebSearch/WebFetch in the main session).
-  - 2+ independent changes in separate files -> one `builder` each, all in ONE message, each briefed with goal, files, done-criteria.
+  - Any implementation over ~30 lines or 2+ phases: before writing code, split it into `builder` briefs (goal, files, done-criteria) and send them in ONE message: one builder per independent file set; phases that share files go to ONE builder, in order.
   - [build-delegate] Builds, test runs, installers, sandboxes and self-tests ALWAYS go to a `builder` (Sonnet) agent in the background (a hook blocks them in the main session). Brief it with exact commands; ask for pass/fail plus the first errors per target; keep working meanwhile. Live TIA tests count as TIA calls: none from you while it runs.
   - Diff over ~50 lines, multi-file, or risky -> `reviewer` once before reporting done.
 - Reviews: pick by intent (if I name one, use that):
@@ -49,7 +49,7 @@
 - Connect only when I ask you to work on the live project.
 - The live project is one shared state: one writer at a time, you or ONE `tia-executor`/`tia-operator`. While it runs, make no TIA calls; wait for its report.
 - Parallel `Explore` is fine for docs (~/Documents/Git/Init_Tia_MCP/.claude/skills/knowledge/: recipes, conventions.md, v21-gaps.md; api-v21; XmlDoc), never for project files (Rule 0).
-- A few TIA calls: do them yourself. Ad-hoc or small live change: `tia-operator` with recipe, softwarePath and done-criteria.
+- A single read-only TIA call I asked for: do it yourself. Ad-hoc or small live change: `tia-operator` with recipe, softwarePath and done-criteria.
 - TIA change pipeline: lead plans -> `builder` writes sources -> `tia-scout` writes the JSON call plan (offline) -> ONE `tia-executor` runs ValidatePlan + RunPlan + compile -> lead checks step results. The lead makes no TIA calls except a single read I asked for.
 - Judge TIA work by the server's per-step ok/compile counts, never by an agent's prose.
 - Project facts (softwarePaths, device/table names) live in <plc-project>\.claude\tia-cookbook.md; only the lead writes it.

@@ -12,9 +12,10 @@ $code = $LASTEXITCODE
 
 $cfg = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
 $skip = if ($NoBypass) { '' } else { ' --dangerously-skip-permissions' }
-# Sync-ClaudeSetup: cc / cco pull this repo first; if it changed, the copied files are reinstalled (fast, no plugin steps).
+# Sync-ClaudeSetup: cc / cco pull this repo, then sync.js reinstalls whatever differs from the installed copy
+# (local edits too). The tlm-core SessionStart hook runs the same sync.js for sessions not started by cc / cco.
 $repo = $PSScriptRoot
-$sync = 'function Sync-ClaudeSetup { $r = "' + $repo + '"; if (-not (Test-Path "$r\.git") -or -not (Get-Command git -ErrorAction SilentlyContinue)) { return }; $a = git -C $r rev-parse HEAD; git -C $r pull --ff-only -q 2>$null; if ((git -C $r rev-parse HEAD) -ne $a) { Write-Host "claude-setup updated - reinstalling"; node "$r\install.js" --no-plugins | Out-Null } }'
+$sync = 'function Sync-ClaudeSetup { $r = "' + $repo + '"; if ((Test-Path "$r\.git") -and (Get-Command git -ErrorAction SilentlyContinue)) { git -C $r pull --ff-only -q 2>$null }; node "$r\sync.js" }'
 $cc  = "function cc  { Sync-ClaudeSetup; claude --model sonnet --effort medium$skip --settings `"$cfg\cc-settings.json`" @args }"
 $cco = "function cco { Sync-ClaudeSetup; claude --model opus --effort medium$skip @args }"
 $profiles = @(

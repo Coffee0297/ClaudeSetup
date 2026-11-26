@@ -50,12 +50,25 @@ function installClaudeMd() {
 }
 
 // ---- 2. agents + commands ----------------------------------------------------------------
+const sync = require('./sync')
+let oldManifest = {}
+try { oldManifest = JSON.parse(read(sync.MANIFEST)) } catch {}
+const manifest = { noBypass: NO_BYPASS }
 function copyDir(sub) {
   const from = path.join(SRC, sub), to = path.join(CFG, sub)
-  for (const name of fs.readdirSync(from)) {
+  manifest[sub] = fs.readdirSync(from)
+  for (const name of manifest[sub]) {
     const src = read(path.join(from, name)), dst = path.join(to, name)
     if (read(dst) === src) continue
     write(dst, src)
+  }
+  // remove files an earlier run copied that are gone from the repo (files you added yourself are never listed)
+  for (const name of oldManifest[sub] || []) {
+    const dst = path.join(to, name)
+    // case-insensitive: on Windows a case-only rename must not delete the renamed file
+    if (manifest[sub].some(n => n.toLowerCase() === name.toLowerCase()) || !fs.existsSync(dst)) continue
+    log(`remove ${dst}`)
+    if (!DRY) fs.unlinkSync(dst)
   }
 }
 
@@ -123,6 +136,12 @@ function installPlugins() {
       if (u.status !== 0) { console.error(`ERROR: could not install or update ${p}`); errors++ }
     }
   }
+  // `plugin update` keeps a cached copy whose version is unchanged; reinstall tlm-core when its content differs
+  if (!DRY && sync.pluginStale('tlm-core')) {
+    claude(['plugin', 'uninstall', 'tlm-core@claude-setup', '--scope', 'user'], true)
+    claude(['plugin', 'install', 'tlm-core@claude-setup', '--scope', 'user'])
+    if (sync.pluginStale('tlm-core')) { console.error('ERROR: the cached tlm-core still differs from plugins/tlm-core'); errors++ }
+  }
 }
 
 console.log(`claude-setup -> ${CFG}${DRY ? '  (dry run: nothing is written)' : ''}`)
@@ -131,5 +150,7 @@ copyDir('agents')
 copyDir('commands')
 installSettings()
 installPlugins()
+// remember what was installed (sync.js compares against it); a failed run is retried by the next sync
+if (!DRY && !errors) write(sync.MANIFEST, JSON.stringify({ ...manifest, config: sync.configHash() }, null, 1))
 console.log(errors ? `\nFinished with ${errors} error(s).` : '\nDone. Start a NEW Claude Code session (and restart the desktop app) to load it.')
 process.exit(errors ? 1 : 0)
