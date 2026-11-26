@@ -17,11 +17,26 @@ process.stdin.on('end', () => {
     block('tia-scout is offline-only');
   }
 
-  // RunPlan/ValidatePlan carry InvokeOpennessApi-style args inside their steps: JSON.stringify(input) covers every step.
-  if (/^mcp__tia-portal.*__(InvokeOpennessApi|RunPlan|ValidatePlan)$/.test(tool)) {
-    const s = JSON.stringify(input);
-    if (/download|upload|ip.?address|ipv4|subnet|router|password|secret|firmware|go.?online|online|protect|knowhow|know.?how|factory.?reset|ram.?to.?rom|activation.?state|safety|alarm|runtime|commit.?session|delete.?(local)?session/i.test(s)) {
-      block('InvokeOpennessApi/RunPlan call touches download/network/password/protection/safety/online/runtime');
+  // Plans: the settings.json deny list only sees the outer tool name, so check every step's tool and args here.
+  // Keywords are tested per step (tool+args), not on title/metadata, so plan names do not trigger them.
+  const RISKY = /download|upload|ip.?address|ipv4|subnet|router|password|secret|firmware|go.?online|online|protect|knowhow|know.?how|factory.?reset|ram.?to.?rom|activation.?state|safety|alarm|runtime|commit.?session|delete.?(local)?session/i;
+  const DENIED = /^(DownloadToDevice|SetIpAddress|SetNetworkInterfaceAttribute|ChangeDeviceFirmwareVersion|GoOnline|SetPlcPassword|SetPlcAccessPassword|ResetPlcAccessPassword|SetPlcMasterSecret|ChangePlcMasterSecret|ResetPlcMasterSecret|SetProjectUserPassword|SetOpcUaUserPassword|SetWebserverUserPassword|SetSafetyOfflineProgramPassword|RevokeSafetyOfflineProgramPassword|SetSafetyModificationsPossible|SetFChangeHistoryUsername|ProtectPlcConfiguration|UnprotectPlcConfiguration|ProtectPlcMasterSecret|UnprotectPlcMasterSecret|SetPlcProtectionAccessLevel|RemoveBlockKnowHowProtection|RemoveBlockWriteProtection|SetBlockKnowHowProtection|PerformDriveFactoryReset|PerformDriveRamToRomCopy|ChangeDriveObjectActivationState|WriteWinCCTags|AcknowledgeAlarms|ResetAlarms|ShelveAlarms|DisableAlarms|UnlockProductionScreenWrites|CloseAndCommitSession|DeleteLocalSessionFromServer)$/;
+  if (ev.agent_type === 'tia-scout' && /__ValidatePlan$/.test(tool) && /connected/i.test(String(input.mode || ''))) block('tia-scout is offline-only (ValidatePlan mode=connected)');
+  if (/^mcp__tia-portal.*__(RunPlan|ValidatePlan)$/.test(tool)) {
+    let plan = input.plan;
+    if (typeof plan === 'string') { try { plan = JSON.parse(plan); } catch { plan = null; } }
+    const steps = plan && Array.isArray(plan.steps) ? [...plan.steps, ...(Array.isArray(plan.cleanup) ? plan.cleanup : [])] : [input];
+    for (const st of steps) {
+      if (DENIED.test(String((st && st.tool) || '').replace(/^.*__/, '')) || RISKY.test(JSON.stringify(st))) {
+        block('plan step touches a denied tool or download/network/password/protection/safety/online/runtime');
+      }
+    }
+    process.exit(0);
+  }
+
+  if (/^mcp__tia-portal.*__InvokeOpennessApi$/.test(tool)) {
+    if (RISKY.test(JSON.stringify(input))) {
+      block('InvokeOpennessApi call touches download/network/password/protection/safety/online/runtime');
     }
     process.exit(0);
   }
