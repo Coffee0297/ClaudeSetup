@@ -41,11 +41,37 @@
             "type": "command",
             "command": "node -e \"require(require('path').join(process.env.CLAUDE_PLUGIN_ROOT.split(String.fromCharCode(92)).join('/'), 'hooks/graph-hint.js'))\"",
             "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "node -e \"require(require('path').join(process.env.CLAUDE_PLUGIN_ROOT.split(String.fromCharCode(92)).join('/'), 'hooks/usage-hook.js'))\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('path').join(process.env.CLAUDE_PLUGIN_ROOT.split(String.fromCharCode(92)).join('/'), 'hooks/usage-hook.js'))\"",
+            "timeout": 30
           }
         ]
       }
     ],
     "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('path').join(process.env.CLAUDE_PLUGIN_ROOT.split(String.fromCharCode(92)).join('/'), 'hooks/usage-hook.js'))\"",
+            "timeout": 30
+          }
+        ]
+      },
       {
         "matcher": "Skill|Read|Bash|PowerShell|Grep|Glob|WebFetch|Agent|Task|mcp__.*",
         "hooks": [

@@ -1,6 +1,6 @@
 {
   "name": "tlm-core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Guard hook (flashing, PR/release, dangerous TIA Openness calls, PowerShell-through-Bash, builds in the lead) and routing hints (graph-first, Explore-first, advisor context warning).",
   "author": {
     "name": "tlm"

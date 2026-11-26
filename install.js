@@ -58,7 +58,7 @@ function copyDir(sub) {
   const from = path.join(SRC, sub), to = path.join(CFG, sub)
   manifest[sub] = fs.readdirSync(from)
   for (const name of manifest[sub]) {
-    const src = read(path.join(from, name)), dst = path.join(to, name)
+    const src = read(path.join(from, name)).split('{{REPO}}').join(REPO.split(path.sep).join('/')), dst = path.join(to, name)
     if (read(dst) === src) continue
     write(dst, src)
   }

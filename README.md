@@ -51,6 +51,16 @@ Backups are made once, as `settings.json.bak-setup` and `CLAUDE.md.bak-setup`.
 
 Plugins load from this folder, so plugin changes apply at the next session start. After adding a **new** plugin to the repo, run the full installer once on each machine.
 
+## Token log
+
+On `/handoff` and at session end (`/clear`, exit), the tlm-core hook appends this session's token use to `~/.claude/usage-log.jsonl`. It records, per model:
+- lead, each subagent type, and advisor
+- peak context
+- tool calls and errors
+- title, first prompt and the "## Current state" handoff
+
+`/usage-report [days]` (or `node usage.js report 7`) summarizes the week and flags what to tweak.
+
 ## Cloud sessions (claude.ai/code)
 
 Add to the cloud environment's setup script:
