@@ -12,8 +12,11 @@ $code = $LASTEXITCODE
 
 $cfg = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
 $skip = if ($NoBypass) { '' } else { ' --dangerously-skip-permissions' }
-$cc  = "function cc  { claude --model sonnet --effort medium$skip --settings `"$cfg\cc-settings.json`" @args }"
-$cco = "function cco { claude --model opus --effort medium$skip @args }"
+# Sync-ClaudeSetup: cc / cco pull this repo first; if it changed, the copied files are reinstalled (fast, no plugin steps).
+$repo = $PSScriptRoot
+$sync = 'function Sync-ClaudeSetup { $r = "' + $repo + '"; if (-not (Test-Path "$r\.git") -or -not (Get-Command git -ErrorAction SilentlyContinue)) { return }; $a = git -C $r rev-parse HEAD; git -C $r pull --ff-only -q 2>$null; if ((git -C $r rev-parse HEAD) -ne $a) { Write-Host "claude-setup updated - reinstalling"; node "$r\install.js" --no-plugins | Out-Null } }'
+$cc  = "function cc  { Sync-ClaudeSetup; claude --model sonnet --effort medium$skip --settings `"$cfg\cc-settings.json`" @args }"
+$cco = "function cco { Sync-ClaudeSetup; claude --model opus --effort medium$skip @args }"
 $profiles = @(
   (Join-Path $HOME 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'),
   (Join-Path $HOME 'Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1')
@@ -22,14 +25,14 @@ foreach ($p in $profiles) {
   # rewrite line by line (never append to an unterminated last line); first split any
   # "function cc/cco" that an earlier tool glued onto the end of another line
   $raw = if (Test-Path $p) { [IO.File]::ReadAllText($p) } else { '' }
-  $raw = $raw -replace '(?<=[^\r\n])(function cco?\s)', "`r`n`$1"
-  $lines = @($raw -split "`r?`n" | Where-Object { $_ -notmatch '^function cco?\s' })
+  $raw = $raw -replace '(?<=[^\r\n])(function (cco?|Sync-ClaudeSetup)\s)', "`r`n`$1"
+  $lines = @($raw -split "`r?`n" | Where-Object { $_ -notmatch '^function (cco?|Sync-ClaudeSetup)\s' })
   while ($lines.Count -gt 0 -and $lines[-1] -eq '') { $lines = @($lines | Select-Object -SkipLast 1) }
-  $lines += $cc; $lines += $cco
+  $lines += $sync; $lines += $cc; $lines += $cco
   if ($DryRun) { Write-Host "[dry-run] shortcuts -> $p"; continue }
   New-Item -ItemType Directory -Force (Split-Path $p) | Out-Null
   Set-Content $p $lines -Encoding UTF8
-  Write-Host "shortcuts cc / cco -> $p"
+  Write-Host "shortcuts cc / cco (with auto-update) -> $p"
 }
 Write-Host 'Open a NEW PowerShell window for cc / cco.'
 exit $code

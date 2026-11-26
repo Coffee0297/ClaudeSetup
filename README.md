@@ -44,10 +44,11 @@ Backups are made once, as `settings.json.bak-setup` and `CLAUDE.md.bak-setup`.
 
 ## Update
 
-```bash
-git -C ~/claude-setup pull
-```
-Plugin changes apply at the next session start. If `user/` files changed (rules, agents, settings), re-run the installer.
+- **Windows:** automatic. `cc` and `cco` run `Sync-ClaudeSetup` first: a quick `git pull` of this repo, and only if something changed, a re-copy of the rules, agents, commands and settings. Offline it just starts Claude. A plain `claude` or the desktop app does not sync: run `Sync-ClaudeSetup` once in PowerShell after you push changes.
+- **Cloud sessions:** automatic (the setup script pulls at every fresh session).
+- **macOS / Linux:** `git -C ~/claude-setup pull && ~/claude-setup/install.sh --no-plugins`
+
+Plugins load from this folder, so plugin changes apply at the next session start. After adding a **new** plugin to the repo, run the full installer once on each machine.
 
 ## Cloud sessions (claude.ai/code)
 
