@@ -19,8 +19,12 @@ $profiles = @(
   (Join-Path $HOME 'Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1')
 ) | Where-Object { (Test-Path $_) -or ($_ -eq $PROFILE) }
 foreach ($p in $profiles) {
-  # rewrite line by line (never append to an unterminated last line)
-  $lines = @(if (Test-Path $p) { Get-Content $p } ) | Where-Object { $_ -notmatch '^function cco?\s' }
+  # rewrite line by line (never append to an unterminated last line); first split any
+  # "function cc/cco" that an earlier tool glued onto the end of another line
+  $raw = if (Test-Path $p) { [IO.File]::ReadAllText($p) } else { '' }
+  $raw = $raw -replace '(?<=[^\r\n])(function cco?\s)', "`r`n`$1"
+  $lines = @($raw -split "`r?`n" | Where-Object { $_ -notmatch '^function cco?\s' })
+  while ($lines.Count -gt 0 -and $lines[-1] -eq '') { $lines = @($lines | Select-Object -SkipLast 1) }
   $lines += $cc; $lines += $cco
   if ($DryRun) { Write-Host "[dry-run] shortcuts -> $p"; continue }
   New-Item -ItemType Directory -Force (Split-Path $p) | Out-Null
