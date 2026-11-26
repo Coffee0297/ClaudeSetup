@@ -4,6 +4,7 @@
 - Put independent tool calls in ONE message. Grep first, then read only the needed lines. Don't re-read files you just edited.
 - Finish every step I listed or you planned; don't stop to check in. If truly blocked, say exactly what blocks it.
 - "Done" = verified the way I'll use it: drive the real UI or run the test that exercises the change, not just a build. Say what you verified and what you didn't.
+- Waiting on tests/UI/processes: poll for the condition and continue as soon as it is met; never fixed sleeps. A time budget is only a cap for issues (hangs, failures), not a wait.
 - Ask before assuming wiring, part numbers, hardware state or which file is canonical.
 - Short replies, no narration.
 
